@@ -24,10 +24,14 @@ export class Tile {
   static position = new Float32Array([]);
   static indices = new Uint8Array([]);
 
+  static program = null;
+
   constructor(engine, level, col, row) {
     this.gl = engine.gl;
-    this.program = createProgram(this.gl, Tile.vs, Tile.fs);
-    this.gl.useProgram(this.program);
+    if (Tile.program === null) {
+      Tile.program = createProgram(this.gl, Tile.vs, Tile.fs);
+    }
+    this.gl.useProgram(Tile.program);
 
     this.row = row;
     this.col = col;
@@ -83,7 +87,7 @@ export class Tile {
     };
   }
 
-  // 将地理坐标系转为笛卡尔坐标系
+  // 虚拟地球书的方法：将地理坐标系转为笛卡尔坐标系
   geodeticToCartesian(geodetic) {
     const n = this.geodeticSurfaceNormal(geodetic);
     const radiiSquared = [
@@ -98,6 +102,20 @@ export class Tile {
     ];
     const gamma = Math.sqrt(k[0] * n[0] + k[1] * n[1] + k[2] * n[2]);
     return k.map((i) => i / gamma);
+  }
+
+  // 地理经纬格网的方法：将地理坐标系转为笛卡尔坐标系
+  geodeticToCartesian2(geodetic) {
+    const r = 6378137;
+    const { radLon, radLat } = geodetic;
+    var sin1 = Math.sin(radLon);
+    var cos1 = Math.cos(radLon);
+    var sin2 = Math.sin(radLat);
+    var cos2 = Math.cos(radLat);
+    var x = r * sin1 * cos2;
+    var y = r * sin2;
+    var z = r * cos1 * cos2;
+    return [x, y, z];
   }
 
   // 根据地理坐标系计算表面法线
@@ -115,10 +133,12 @@ export class Tile {
     // 层级为6的时候可能就不需要分段了；
     if (this.level < 6) {
       this.segment = 1 << (6 - this.level);
+      // this.segment = 13;
     } else {
       this.segment = 1;
     }
 
+    // ! deltaX和deltaY应该是相同的
     const deltaX = (this.maxX - this.minX) / this.segment;
     const deltaY = (this.maxY - this.minY) / this.segment;
 
@@ -139,8 +159,11 @@ export class Tile {
         const merX = mercatorXs[j];
         const geodetic = this.webMercatorToGeodetic({ x: merX, y: merY });
         const p = this.geodeticToCartesian(geodetic);
+        // const p = this.geodeticToCartesian2(geodetic);
+
         // ! 这里填充顺序可能要注意下
         this.vertices.push(p[1], p[2], p[0]);
+        // this.vertices.push(...p);
       }
     }
 
@@ -167,7 +190,7 @@ export class Tile {
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(this.program, name);
+    const loc = gl.getAttribLocation(Tile.program, name);
     gl.vertexAttribPointer(loc, num, type, false, 0, 0);
     gl.enableVertexAttribArray(loc);
   }
@@ -179,53 +202,3 @@ export class Tile {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW);
   }
 }
-
-// const tile1 = new Tile(1, 0, 0);
-// console.log(tile1);
-// console.log(tile1.vertices.length);
-// console.log(tile1.indices);
-// const tile2 = new Tile(1, 0, 1);
-// const tile3 = new Tile(1, 1, 0);
-// const tile4 = new Tile(1, 1, 1);
-
-// console.log(tile1);
-// console.log(tile2);
-// console.log(tile3);
-// console.log(tile4);
-
-// const caeresian1 = tile1.geodeticToCartesian({
-//   lon: tile1.minLon,
-//   lat: tile1.minLat,
-// });
-// const caeresian2 = tile1.geodeticToCartesian({
-//   lon: tile1.maxLon,
-//   lat: tile1.maxLat,
-// });
-// const caeresian3 = tile1.geodeticToCartesian({
-//   lon: tile1.minLon,
-//   lat: tile1.maxLat,
-// });
-// const caeresian4 = tile1.geodeticToCartesian({
-//   lon: tile1.maxLon,
-//   lat: tile1.minLat,
-// });
-// console.log(caeresian1);
-// console.log(caeresian2);
-// console.log(caeresian3);
-// console.log(caeresian4);
-
-// [ -6378137, 4.883827135133567e-9, 0 ]
-// [ 552058.2246914064, 0, 6332896.014929354 ]
-// [ -552058.2246914064, 4.227185678077398e-10, 6332896.014929354 ]
-// [ 6378137, 0, 0 ]
-
-// [ 0, 6332896.014929354, 552058.2246914064,  ]
-// [  4.227185678077398e-10, 6332896.014929354, -552058.2246914064]
-// [ 0, 0, 6378137 ]
-// [  4.883827135133567e-9, 0, -6378137]
-
-// [ 0, 6332896.014929354, 552058.2246914064,
-//   4.227185678077398e-10, 6332896.014929354, -552058.2246914064,
-//   0, 0, 6378137,
-//   4.883827135133567e-9, 0, -6378137
-// ]

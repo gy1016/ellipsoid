@@ -5,10 +5,11 @@ import { Tile } from "../geographic/Tile.js";
 function loadWebGL() {
   const engine = new Engine("webgl");
 
-  const camera = new Camera([25378137, 0, 0], [0, 0, 0], [0, 1, 0]);
-  const tile = new Tile(engine, 1, 0, 1);
+  // 12756274 原平面距离
+  const camera = new Camera([0, 0, 12378137], [0, 0, 0], [0, 1, 0]);
+  const tile = new Tile(engine, 1, 0, 0);
 
-  engine.getActiveUniform(tile.program);
+  engine.getActiveUniform(Tile.program);
 
   const sceneData = {
     u_MvpMatrix: camera.mvpMatrix.elements,
