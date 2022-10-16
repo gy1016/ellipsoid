@@ -10,8 +10,9 @@ export class Engine {
   initState() {
     const gl = this.gl;
     // gl.enable(gl.DEPTH_TEST);
+    // gl.depthFunc(gl.EQUAL);
     gl.enable(gl.CULL_FACE);
-    gl.cullFace(gl.BACK);
+    // gl.cullFace(gl.BACK);
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
   }
 
