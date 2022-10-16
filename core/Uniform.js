@@ -34,7 +34,7 @@ export class Uniform {
             data[1]
           );
           gl.uniform1i(uniform.loc, data[0]);
-          gl.clear(gl.COLOR_BUFFER_BIT);
+          // gl.clear(gl.COLOR_BUFFER_BIT);
         };
         break;
       default:

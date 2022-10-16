@@ -31,6 +31,11 @@ export class Camera {
           up[0],     up[1],     up[2]
     );
 
-    this.perspectMatrix = new Matrix4().setPerspective(60, 1, 1.0, 6378137 * 2);
+    this.perspectMatrix = new Matrix4().setPerspective(
+      60,
+      1,
+      1.0,
+      6378137 * 50
+    );
   }
 }
