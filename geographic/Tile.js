@@ -25,11 +25,11 @@ export class Tile {
 
   constructor(engine, level, col, row) {
     this.url = `http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x=${col}&y=${row}&z=${level}&s=Gali`;
+    this.img = null;
     this.gl = engine.gl;
     if (Tile.program === null) {
       Tile.program = createProgram(this.gl, Tile.vs, Tile.fs);
     }
-    this.gl.useProgram(Tile.program);
 
     this.row = row;
     this.col = col;
@@ -49,9 +49,6 @@ export class Tile {
     this.maxLat = tmp.radLat;
 
     this.generateVertex();
-
-    this.initArrayBuffer(this.vertices, "position", 3, this.gl.FLOAT);
-    this.initElementBuffer(this.indices);
   }
 
   // 根据行列号得到web墨卡坐标

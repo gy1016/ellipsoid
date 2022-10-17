@@ -1,10 +1,14 @@
 import { Uniform } from "./Uniform.js";
+import { TileLayer } from "../geographic/TileLayer.js";
+import { Tile } from "../geographic/Tile.js";
 
 export class Engine {
   constructor(id) {
     this.uniforms = Object.create(null);
     this.gl = document.getElementById(id).getContext("webgl");
     this.initState();
+    this.sceneData = Object.create(null);
+    this.layers = [];
   }
 
   initState() {
@@ -17,6 +21,7 @@ export class Engine {
   }
 
   getActiveUniform(program) {
+    if (Object.keys(this.uniforms).length > 0) return;
     const gl = this.gl;
     const uniformCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
     for (let i = 0; i < uniformCount; ++i) {
@@ -31,5 +36,21 @@ export class Engine {
     for (let key of keys) {
       this.uniforms[key].applyfunc(data[key]);
     }
+  }
+
+  render() {
+    // 渲染瓦片图层
+    this.gl.useProgram(Tile.program);
+    for (let i = 0; i < this.layers.length; ++i) {
+      const layer = this.layers[i];
+      layer.refresh();
+    }
+    requestAnimationFrame(this.render.bind(this));
+  }
+
+  run() {
+    const tileLayer = new TileLayer(this, 2);
+    this.layers.push(tileLayer);
+    requestAnimationFrame(this.render.bind(this));
   }
 }
