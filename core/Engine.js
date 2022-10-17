@@ -5,10 +5,13 @@ import { Tile } from "../geographic/Tile.js";
 export class Engine {
   constructor(id) {
     this.uniforms = Object.create(null);
-    this.gl = document.getElementById(id).getContext("webgl");
+    this.canvas = document.getElementById(id);
+    this.gl = this.canvas.getContext("webgl");
     this.initState();
     this.sceneData = Object.create(null);
     this.layers = [];
+    this.camera = null;
+    this.oribitControl = null;
   }
 
   initState() {
@@ -40,6 +43,8 @@ export class Engine {
 
   render() {
     // 渲染瓦片图层
+    console.log(this.camera.position[2], this.camera.mvpMatrix);
+    this.sceneData.u_MvpMatrix = this.camera.mvpMatrix.elements;
     this.gl.useProgram(Tile.program);
     for (let i = 0; i < this.layers.length; ++i) {
       const layer = this.layers[i];
