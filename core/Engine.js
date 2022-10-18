@@ -1,6 +1,8 @@
 import { Uniform } from "./Uniform.js";
 import { TileLayer } from "../geographic/TileLayer.js";
 import { Tile } from "../geographic/Tile.js";
+import { Camera } from "./Camera.js";
+import { OribitControl } from "./OribitControl.js";
 
 export class Engine {
   constructor(id) {
@@ -8,10 +10,13 @@ export class Engine {
     this.canvas = document.getElementById(id);
     this.gl = this.canvas.getContext("webgl");
     this.initState();
-    this.sceneData = Object.create(null);
+
     this.layers = [];
-    this.camera = null;
-    this.oribitControl = null;
+    // 相机的实例化必须在轨道控制之前；
+    this.camera = new Camera([0, 0, 11900000 + 6378137], [0, 0, 0], [0, 1, 0]);
+    this.oribitControl = new OribitControl(this);
+    this.sceneData = Object.create(null);
+    this.sceneData.u_MvpMatrix = this.camera.mvpMatrix.elements;
   }
 
   initState() {
@@ -43,7 +48,6 @@ export class Engine {
 
   render() {
     // 渲染瓦片图层
-    console.log(this.camera.position[2], this.camera.mvpMatrix);
     this.sceneData.u_MvpMatrix = this.camera.mvpMatrix.elements;
     this.gl.useProgram(Tile.program);
     for (let i = 0; i < this.layers.length; ++i) {

@@ -1,5 +1,5 @@
 import { Camera } from "./core/Camera.js";
-import { Ellipsoid } from "./core/Ellipsoid.js";
+import { Ellipsoid } from "./geographic/Ellipsoid.js";
 import { Engine } from "./core/Engine.js";
 import { RayCastedGlobe } from "./geographic/RayCastedGlobe.js";
 
