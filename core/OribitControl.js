@@ -15,9 +15,9 @@ export class OribitControl {
 
   handleMouseWheel(event) {
     if (event.deltaY < 0) {
-      this.camera.position[2] -= 6378137;
+      this.camera.position[2] -= 3189068;
     } else if (event.deltaY > 0) {
-      this.camera.position[2] += 6378137;
+      this.camera.position[2] += 3189068;
     }
   }
 }

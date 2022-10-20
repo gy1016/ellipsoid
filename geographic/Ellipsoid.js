@@ -7,6 +7,19 @@ export class Ellipsoid {
     this.oneOverRadiiSquared = [1 / (a * a), 1 / (b * b), 1 / (c * c)];
   }
 
+  // 根据笛卡尔坐标系坐标求解归一化法线
+  geodeticSurfaceNormal(positionOnEllipsoid) {
+    let tmp = [
+      positionOnEllipsoid[0] * this.oneOverRadiiSquared[0],
+      positionOnEllipsoid[1] * this.oneOverRadiiSquared[1],
+      positionOnEllipsoid[2] * this.oneOverRadiiSquared[2],
+    ];
+    let magnitude = Math.sqrt(tmp.reduce((pre, cur) => pre + cur * cur, 0));
+
+    return tmp.map((p) => p / magnitude);
+  }
+
+  // 将空间中笛卡尔坐标转到地心法线的椭球面上
   scaleToGeocentricSurface(position) {
     const beta =
       1.0 /
@@ -18,6 +31,7 @@ export class Ellipsoid {
     return position.map((p) => beta * p);
   }
 
+  // 将空间中笛卡尔坐标转到地表法线的椭球面上
   scaleToGeodeticSurface(position) {
     const beta =
       1.0 /
@@ -78,5 +92,25 @@ export class Ellipsoid {
     } while (Math.abs(s) > 1e-10);
 
     return [position[0] / da, position[1] / db, position[2] / dc];
+  }
+
+  toGeodetic2D(positionOnEllipsoid) {
+    const normal = this.geodeticSurfaceNormal(positionOnEllipsoid);
+    return [
+      Math.atan2(normal[1], normal[0]),
+      Math.asin(
+        normal[2] / Math.sqrt(normal.reduce((pre, cur) => pre + cur * cur, 0))
+      ),
+    ];
+  }
+
+  // 将笛卡尔坐标系下的点转为地理坐标系
+  toGeodetic3D(position) {
+    const p = this.scaleToGeodeticSurface(position);
+    const h = [position[0] - p[0], position[1] - p[1], position[2] - p[2]];
+    const height =
+      Math.sign(h[0] * position[0] + h[1] * position[1] + h[2] * position[2]) *
+      Math.sqrt(h.reduce((pre, cur) => pre + cur * cur, 0));
+    return [...this.toGeodetic2D(p), height];
   }
 }

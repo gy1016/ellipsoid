@@ -24,7 +24,8 @@ export class Tile {
   static program = null;
 
   constructor(engine, level, col, row) {
-    this.url = `http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x=${col}&y=${row}&z=${level}&s=Gali`;
+    // this.url = `http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x=${col}&y=${row}&z=${level}&s=Gali`;
+    this.url = `https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/${level}/${row}/${col}`;
     this.img = null;
     this.gl = engine.gl;
     if (Tile.program === null) {
