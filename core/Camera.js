@@ -44,6 +44,7 @@ export class Camera {
   update() {
     // 相机距离原点的欧氏距离，减去地球半径，得到距离地球表面的距离
     const engine = this.engine;
+    engine.oribitControl.update();
     const position = this.position;
 
     const surface = engine.ellipsoid.scaleToGeodeticSurface(position);
@@ -91,7 +92,5 @@ export class Camera {
     } else {
       this.level = 2;
     }
-
-    // console.log(this.level);
   }
 }

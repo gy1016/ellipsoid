@@ -14,12 +14,7 @@ export class Engine {
 
     this.layers = [];
     // 相机的实例化必须在轨道控制之前；
-    this.camera = new Camera(
-      this,
-      [0, 0, 11900000 + 6378137],
-      [0, 0, 0],
-      [0, 1, 0]
-    );
+    this.camera = new Camera(this, [0, 0, 18278137], [0, 0, 0], [0, 1, 0]);
     this.oribitControl = new OribitControl(this);
     this.sceneData = Object.create(null);
     this.sceneData.u_MvpMatrix = this.camera.mvpMatrix.elements;
@@ -32,7 +27,7 @@ export class Engine {
 
   initState() {
     const gl = this.gl;
-    // gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.DEPTH_TEST);
     // gl.depthFunc(gl.EQUAL);
     gl.enable(gl.CULL_FACE);
     // gl.cullFace(gl.BACK);
@@ -60,10 +55,10 @@ export class Engine {
   render() {
     // 渲染瓦片图层
     this.camera.update();
-    // if (this.camera.level !== this.lastLevel) {
-    //   this.layers[0] = new TileLayer(this, 3);
-    //   this.lastLevel = this.camera.level;
-    // }
+    if (this.camera.level !== this.lastLevel) {
+      this.layers[0] = new TileLayer(this, this.camera.level);
+      this.lastLevel = this.camera.level;
+    }
     this.sceneData.u_MvpMatrix = this.camera.mvpMatrix.elements;
     this.gl.useProgram(Tile.program);
     for (let i = 0; i < this.layers.length; ++i) {
@@ -74,7 +69,7 @@ export class Engine {
   }
 
   run() {
-    const tileLayer = new TileLayer(this, 3);
+    const tileLayer = new TileLayer(this, 2);
     this.layers.push(tileLayer);
     requestAnimationFrame(this.render.bind(this));
   }
