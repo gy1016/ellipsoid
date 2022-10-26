@@ -100,11 +100,8 @@ export class TileLayer {
   */
   // ! 这个判断条件很关键，阈值的选取很重要！
   checkVisible(visibleInfo) {
-    if (
-      visibleInfo.area >= 500 &&
-      visibleInfo.clockwise &&
-      visibleInfo.visibleCount >= 1
-    ) {
+    // visibleInfo.clockwise &&
+    if (visibleInfo.area >= 500 && visibleInfo.visibleCount >= 1) {
       return true;
     }
     return false;

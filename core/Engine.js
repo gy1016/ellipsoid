@@ -4,6 +4,7 @@ import { Tile } from "../geographic/Tile.js";
 import { Camera } from "./Camera.js";
 import { OribitControl } from "./OribitControl.js";
 import { Ellipsoid } from "../geographic/Ellipsoid.js";
+import { Renderer } from "./Renderer.js";
 
 export class Engine {
   constructor(id) {
@@ -14,15 +15,13 @@ export class Engine {
 
     this.layers = [];
     // 相机的实例化必须在轨道控制之前；
-    this.camera = new Camera(this, [0, 18278137, 0], [0, 0, 0], [0, 1, 0]);
+    this.camera = new Camera(this, [0, 27278137, 0], [0, 0, 0], [0, 1, 0]);
     this.oribitControl = new OribitControl(this);
     this.sceneData = Object.create(null);
     this.sceneData.u_MvpMatrix = this.camera.mvpMatrix.elements;
 
     this.ellipsoid = Ellipsoid.Wgs84;
-
-    this.curLevel = 2;
-    this.lastLevel = 2;
+    this.renderer = new Renderer(this);
   }
 
   initState() {
@@ -57,9 +56,9 @@ export class Engine {
     this.camera.update();
 
     // 如果相机的层级发生了改变就更换当前图层
-    if (this.camera.level !== this.lastLevel) {
+    if (this.camera.level !== this.camera.lastLevel) {
       this.layers[0] = new TileLayer(this, this.camera.level);
-      this.lastLevel = this.camera.level;
+      this.camera.lastLevel = this.camera.level;
     }
     if (this.camera.change) {
       this.layers[0].getVisibleTilesByLevel();
@@ -79,7 +78,7 @@ export class Engine {
   }
 
   run() {
-    const tileLayer = new TileLayer(this, 3);
+    const tileLayer = new TileLayer(this, 2);
     this.layers.push(tileLayer);
     requestAnimationFrame(this.render.bind(this));
   }

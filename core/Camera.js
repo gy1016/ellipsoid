@@ -2,6 +2,7 @@ import { MathUtil } from "../geographic/MathUtil.js";
 
 export class Camera {
   level = 2;
+  lastLevel = 2;
   _position = [0, 0, 20378139];
 
   get position() {
