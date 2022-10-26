@@ -94,6 +94,7 @@ export class Ellipsoid {
     return [position[0] / da, position[1] / db, position[2] / dc];
   }
 
+  // [经度, 维度]
   toGeodetic2D(positionOnEllipsoid) {
     const normal = this.geodeticSurfaceNormal(positionOnEllipsoid);
     return [

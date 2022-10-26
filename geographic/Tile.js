@@ -23,6 +23,25 @@ export class Tile {
 
   static program = null;
 
+  static getTileGridByBrother(level, row, col, position) {
+    const maxSize = 1 << level;
+    let newRow = row,
+      newCol = col;
+    // TODO: 用取余数可以优化
+    if (position == "left") {
+      newCol = col === 0 ? maxSize - 1 : col - 1;
+    } else if (position == "right") {
+      newCol = col === maxSize - 1 ? 0 : col + 1;
+    } else if (position == "top") {
+      newRow = row === 0 ? maxSize - 1 : row - 1;
+    } else if (position == "bottom") {
+      newRow = row === maxSize - 1 ? 0 : row + 1;
+    } else {
+      throw "invalid position";
+    }
+    return [newRow, newCol];
+  }
+
   constructor(engine, level, col, row) {
     // this.url = `http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x=${col}&y=${row}&z=${level}&s=Gali`;
     this.url = `https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/${level}/${row}/${col}`;
