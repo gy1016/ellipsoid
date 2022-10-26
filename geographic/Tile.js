@@ -42,6 +42,10 @@ export class Tile {
     return [newRow, newCol];
   }
 
+  static getUniqueKey(level, row, col) {
+    return `${level}_${row}_${col}`;
+  }
+
   constructor(engine, level, col, row) {
     // this.url = `http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x=${col}&y=${row}&z=${level}&s=Gali`;
     this.url = `https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/${level}/${row}/${col}`;

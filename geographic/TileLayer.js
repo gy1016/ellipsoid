@@ -5,6 +5,7 @@ import { MathUtil } from "./MathUtil.js";
 export class TileLayer {
   constructor(engine, level) {
     this.engine = engine;
+    this.tileCache = engine.tileCache;
 
     this.level = level;
     // 当前层及下一行或一列最多有的瓦片数量
@@ -112,7 +113,17 @@ export class TileLayer {
     const LOOP_LIMIT = Math.min(10, Math.pow(2, this.level) - 1);
 
     const result = [];
-    let grid = new Tile(this.engine, this.level, col, row);
+    let grid;
+    let key = Tile.getUniqueKey(this.level, row, col);
+    if (!this.tileCache.get(key)) {
+      grid = new Tile(this.engine, this.level, col, row);
+      this.tileCache.put(key, grid);
+    } else {
+      grid = this.tileCache.get(key);
+    }
+
+    // TODO: key最好用数字，速度快
+    this.engine.tileCache.put(this.level + "_" + row + "_" + col, grid);
     const visibleInfo = this.getTileVisibleInfo(grid.level, grid.row, grid.col);
     const isRowCenterVisible = this.checkVisible(visibleInfo);
     if (isRowCenterVisible) {
@@ -139,7 +150,14 @@ export class TileLayer {
         );
         visible = this.checkVisible(curVisibleInfo);
         if (visible) {
-          const newTile = new Tile(this.engine, this.level, newCol, newRow);
+          let key = Tile.getUniqueKey(this.level, newRow, newCol);
+          let newTile;
+          if (!this.tileCache.get(key)) {
+            newTile = new Tile(this.engine, this.level, newCol, newRow);
+            this.tileCache.put(key, newTile);
+          } else {
+            newTile = this.tileCache.get(key);
+          }
           newTile.visibleInfo = curVisibleInfo;
           result.push(newTile);
         } else {
@@ -165,7 +183,14 @@ export class TileLayer {
         );
         visible = this.checkVisible(curVisibleInfo);
         if (visible) {
-          const newTile = new Tile(this.engine, this.level, newCol, newRow);
+          let key = Tile.getUniqueKey(this.level, newRow, newCol);
+          let newTile;
+          if (!this.tileCache.get(key)) {
+            newTile = new Tile(this.engine, this.level, newCol, newRow);
+            this.tileCache.put(key, newTile);
+          } else {
+            newTile = this.tileCache.get(key);
+          }
           newTile.visibleInfo = curVisibleInfo;
           result.push(newTile);
         } else {

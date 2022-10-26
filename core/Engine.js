@@ -5,6 +5,7 @@ import { Camera } from "./Camera.js";
 import { OribitControl } from "./OribitControl.js";
 import { Ellipsoid } from "../geographic/Ellipsoid.js";
 import { Renderer } from "./Renderer.js";
+import { LRU } from "./LRU.js";
 
 export class Engine {
   constructor(id) {
@@ -22,6 +23,8 @@ export class Engine {
 
     this.ellipsoid = Ellipsoid.Wgs84;
     this.renderer = new Renderer(this);
+
+    this.tileCache = new LRU(100);
   }
 
   initState() {
