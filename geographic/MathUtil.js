@@ -133,64 +133,6 @@ export class MathUtil {
     return ndc;
   }
 
-  // 射线与球求交
-  // ! 地球并不是球嗷
-  static intersectPointWithEarth(start, dir) {
-    const result = [];
-    const newStart = [...start];
-    const len = Math.sqrt(dir[0] ** 2 + dir[1] ** 2 + dir[2] ** 2);
-    const newDir = [dir[0] / len, dir[1] / len, dir[2] / len];
-    const r = EARTH_RADIUS;
-    let a = newDir[0];
-    let b = newDir[1];
-    let c = newDir[2];
-    let x0 = newStart[0];
-    let y0 = newStart[1];
-    let z0 = newStart[2];
-    let a2 = a * a;
-    let b2 = b * b;
-    let c2 = c * c;
-    let r2 = r * r;
-    let ay0 = a * y0;
-    let az0 = a * z0;
-    let bx0 = b * x0;
-    let bz0 = b * z0;
-    let cx0 = c * x0;
-    let cy0 = c * y0;
-    let deltaA = ay0 * bx0 + az0 * cx0 + bz0 * cy0;
-    let deltaB =
-      ay0 * ay0 + az0 * az0 + bx0 * bx0 + bz0 * bz0 + cx0 * cx0 + cy0 * cy0;
-    let deltaC = a2 + b2 + c2;
-    let delta = 8 * deltaA - 4 * deltaB + 4 * r2 * deltaC;
-    if (delta < 0) {
-      result = [];
-    } else {
-      var t = a * x0 + b * y0 + c * z0;
-      var A = a2 + b2 + c2;
-      if (delta == 0) {
-        var k = -t / A;
-        var x = k * a + x0;
-        var y = k * b + y0;
-        var z = k * c + z0;
-        result.push([x, y, z]);
-      } else if (delta > 0) {
-        var sqrtDelta = Math.sqrt(delta);
-        var k1 = (-2 * t + sqrtDelta) / (2 * A);
-        var x1 = k1 * a + x0;
-        var y1 = k1 * b + y0;
-        var z1 = k1 * c + z0;
-        result.push([x1, y1, z1]);
-
-        var k2 = (-2 * t - sqrtDelta) / (2 * A);
-        var x2 = k2 * a + x0;
-        var y2 = k2 * b + y0;
-        var z2 = k2 * c + z0;
-        result.push([x2, y2, z2]);
-      }
-    }
-    return result;
-  }
-
   // 射线与椭球地球相交，并排序
   static rayIntersectEllipsoid(
     rayOrigin,

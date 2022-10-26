@@ -10,17 +10,20 @@ export class TileLayer {
     // 当前层及下一行或一列最多有的瓦片数量
     this.limit = 1 << level;
     this.tileCountSqrt = 1 << level;
+
     this.lastRowMinNum = -1;
     this.lastColMinNum = -1;
     this.lastRowMaxNum = -1;
     this.lastColMaxNum = -1;
-    // this.lastCameraPosition = [-1, -1, -1];
-    // this.updateTilesNoOptimize();
+
     this.childrens = [];
     this.getVisibleTilesByLevel();
+    // this.lastCameraPosition = [-1, -1, -1];
+    // this.updateTilesNoOptimize();
     // this.getTileBound();
   }
 
+  // 根据相机位置和当前层级得到能够看到的瓦片
   getVisibleTilesByLevel() {
     const level = this.level;
     let result = [];
@@ -89,10 +92,16 @@ export class TileLayer {
     this.childrens = result;
   }
 
+  /* 
+    算法：
+    瓦片的面积要大于阈值；
+    瓦片四个角点ndc是顺时针，这样能确保瓦片是正面而不是背面；
+    至少有一个点是可见的；
+  */
   // ! 这个判断条件很关键，阈值的选取很重要！
   checkVisible(visibleInfo) {
     if (
-      visibleInfo.area >= 5000 &&
+      visibleInfo.area >= 500 &&
       visibleInfo.clockwise &&
       visibleInfo.visibleCount >= 1
     ) {
@@ -101,6 +110,7 @@ export class TileLayer {
     return false;
   }
 
+  // 处理当前行列号这行的瓦片，得到可见瓦片数组
   handleRow(row, col) {
     const LOOP_LIMIT = Math.min(10, Math.pow(2, this.level) - 1);
 
@@ -438,8 +448,7 @@ export class TileLayer {
     }
   }
 
-  // 平面计算逻辑
-  // 更新瓦片子数组
+  // 平面计算逻辑，更新瓦片子数组
   updateTiles() {
     const engine = this.engine;
     const level = this.level;
@@ -472,8 +481,6 @@ export class TileLayer {
   }
 
   refresh() {
-    // this.getTileBound();
-
     const engine = this.engine;
     const gl = engine.gl;
     const sceneData = this.engine.sceneData;

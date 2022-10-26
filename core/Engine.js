@@ -55,19 +55,21 @@ export class Engine {
   render() {
     // 更新相机最新坐标和对应层级
     this.camera.update();
+
     // 如果相机的层级发生了改变就更换当前图层
     if (this.camera.level !== this.lastLevel) {
       this.layers[0] = new TileLayer(this, this.camera.level);
       this.lastLevel = this.camera.level;
-    } else if (this.camera.change) {
+    }
+    if (this.camera.change) {
       this.layers[0].getVisibleTilesByLevel();
     }
+
     // 更新场景数据里面的矩阵
-    // ! 这里可以优化
     this.sceneData.u_MvpMatrix = this.camera.mvpMatrix.elements;
 
     // 准备图层渲染
-    // ! 可以加一个兜底图层
+    // TODO: 加一个兜底图层
     this.gl.useProgram(Tile.program);
     for (let i = 0; i < this.layers.length; ++i) {
       const layer = this.layers[i];

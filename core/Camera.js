@@ -3,7 +3,6 @@ import { MathUtil } from "../geographic/MathUtil.js";
 export class Camera {
   level = 2;
   _position = [0, 0, 20378139];
-  // axisMatrix = new Matrix4();
 
   get position() {
     const geoX = this._position[2];
@@ -64,37 +63,8 @@ export class Camera {
     ];
   }
 
-  // 射线追踪，并将结果进行排序
-  getPickCartesianCoordInEarthByLine(start, dir) {
-    let result = [];
-    const pickVertices = MathUtil.intersectPointWithEarth(start, dir);
-    if (pickVertices.length === 0) {
-      result = [];
-    } else if (pickVertices.length === 1) {
-      result = pickVertices;
-    } else if (pickVertices.length === 2) {
-      const pickVerticeA = pickVertices[0];
-      const pickVerticeB = pickVertices[1];
-      const aLen2 =
-        (pickVerticeA[0] - start[0]) ** 2 +
-        (pickVerticeA[1] - start[1]) ** 2 +
-        (pickVerticeA[2] - start[2]) ** 2;
-      const bLen2 =
-        (pickVerticeB[0] - start[0]) ** 2 +
-        (pickVerticeB[1] - start[1]) ** 2 +
-        (pickVerticeB[2] - start[2]) ** 2;
-
-      result =
-        aLen2 <= bLen2
-          ? [pickVerticeA, pickVerticeB]
-          : [pickVerticeB, pickVerticeA];
-    }
-    return result;
-  }
-
   // 判断世界坐标系中的点是否在canvans中
   isWorldVisibleInCanvas(world, options) {
-    // ! 相机坐标系与地理坐标系xyz对应关系没调整
     const cameraP = this.position;
     const cameraPosSquared = cameraP.map((p) => p * p);
 
@@ -140,29 +110,6 @@ export class Camera {
         return res;
       }
     }
-    // const pickResult = this.getPickCartesianCoordInEarthByLine(cameraP, dir);
-    // if (pickResult.length > 0) {
-    //   const pickVertice = pickResult[0];
-    //   const length2Vertice = Math.sqrt(
-    //     (cameraP[0] - world[0]) ** 2 +
-    //       (cameraP[1] - world[1]) ** 2 +
-    //       (cameraP[2] - world[2]) ** 2
-    //   );
-    //   const length2Pick = Math.sqrt(
-    //     (cameraP[0] - pickVertice[0]) ** 2 +
-    //       (cameraP[1] - pickVertice[1]) ** 2 +
-    //       (cameraP[2] - pickVertice[2]) ** 2
-    //   );
-    //   // ! 这里不明白
-    //   // if (length2Vertice < length2Pick + 5) {
-    //   const res =
-    //     options.verticeInNDC[0] >= -1 &&
-    //     options.verticeInNDC[0] <= 1 &&
-    //     options.verticeInNDC[1] >= -1 &&
-    //     options.verticeInNDC[1] <= 1;
-    //   return res;
-    //   // }
-    // }
 
     return false;
   }
@@ -175,6 +122,7 @@ export class Camera {
     // ! 只会更新相机坐标，无返回值
     engine.oribitControl.update();
     const curPosition = [...this.position];
+
     const position = this.position;
     this.change =
       prePosition[0] !== curPosition[0] ||
@@ -189,6 +137,7 @@ export class Camera {
         (position[2] - surface[2]) ** 2
     );
 
+    // TODO: 这个该用视锥体进行数学计算
     if (h <= 100) {
       this.level = 19;
     } else if (h <= 300) {

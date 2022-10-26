@@ -19,7 +19,7 @@ export class Spherical {
     this.phi = Math.acos(v3[2] / this.radius);
   }
 
-  // js函数传参也是引用拷贝
+  // ! js函数传参也是引用拷贝
   setToVec3(v3) {
     const sinPhiRadius = Math.sin(this.phi) * this.radius;
     v3[1] = sinPhiRadius * Math.sin(this.theta);

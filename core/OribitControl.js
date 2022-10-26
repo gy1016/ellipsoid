@@ -81,7 +81,7 @@ export class OribitControl {
     });
   }
 
-  // ! 最好先修改变量，然后根据变量在update函数里面进行位置更新；
+  // TODO: 缩放太快
   handleMouseWheel(event) {
     if (event.deltaY < 0) {
       this.zoomIn(Math.pow(0.95, 1));
